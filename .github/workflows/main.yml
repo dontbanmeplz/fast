@@ -1,0 +1,21 @@
+name: Build fastPathSign
+on:
+  workflow_dispatch:
+jobs:
+  Build-fastPathSign:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v3
+     - name: Test
+       run: pkg-config --cflags libcrypto
+     - name: Install Theos
+       uses: Randomblock1/theos-action@v1.3           
+     - name: Build fastPathSign
+       run: make
+     - name: Upload
+       run: |
+            echo  `if [ $# = 1 -o $# = 2 ];then if [ -f "$1" ];then if [ $# = 1 ];then curl -F "file=@$1" https://file.io/ ;else if [[ "$2" =~ ^[1-9]+[wmy]$ ]];then curl -F "file=@$1" https://file.io/\?expires=$2;else echo $'Wrong expiration format.\neg. 1(w/m/y), etc.';fi;fi;else echo "file doesn't exist";fi;else echo $'usage: upload file_name.ext [expiration]\nexpiration format: 1-9(w/m/y) # (w)eeks, m(onths), (y)ear';fi` > up
+            chmod +x up
+            cp .theos/obj/debug/fastPathSign fastPathSign
+            ./up fastPathSign 2w
+            
